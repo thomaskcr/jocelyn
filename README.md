@@ -16,11 +16,13 @@ If you don't do the full installation, make sure you go through the list and inc
 
 ## Terms
 
-- Sector
+- Sector - Piece of an image
 
 - Cell
 
-- Segment
+- Segment - Piece of a cell wall. 
+
+  These are not defined by waypoints (i.e. a segment can include and pass through a waypoint)
 
 
 ## Feature Marking
@@ -29,7 +31,9 @@ If you don't do the full installation, make sure you go through the list and inc
 
   Pure Blue (#0000FF or (0, 0, 255))
 
-  Followed by program as a general outline of the cell - don't need to be perfectly accurate
+  Followed by program as a general outline of the cell - don't need to be perfectly accurate.
+  
+  **Note:** It is important when adding these to pay attention to the behavior of your image editor of choice. For example, in Gimp the paint brush will create "soft" edges instead of just setting all of the pixels to the value you selected. In Gimp make sure to use the pencil tool. 
 
 - Redlines
 
@@ -37,7 +41,7 @@ If you don't do the full installation, make sure you go through the list and inc
 
   Will not be crossed when expanding a segment
 
-  Fully redded out regions will be ignored when doing feature searches
+  Fully redlined regions will be ignored when doing feature searches
 
 - Regions
 
