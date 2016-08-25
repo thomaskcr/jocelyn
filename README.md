@@ -59,3 +59,4 @@ python run.py --path-check ../examples/waypoints/
 
 This will show the computed path based on the waypoints provided. 
 
+![](examples/waypoints/output_figure_1.png)
