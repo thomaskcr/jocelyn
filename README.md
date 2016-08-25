@@ -3,8 +3,15 @@
 
 ### Windows
 
-The Python(x,y) distribution has all of the tools needed. Download it here: http://python-xy.github.io/downloads.html
+The Python(x,y) distribution has all of the tools needed. Download it here: http://python-xy.github.io/downloads.html 
 
+If you don't do the full installation, make sure you go through the list and include:
+
+- OpenCV
+- Scipy
+- Numpy
+- scikit-image
+- Matplotlib
 
 
 ## Terms
