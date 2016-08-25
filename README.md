@@ -1,11 +1,10 @@
 
 ## Installation
 
-- Install Python 2.7.x
-  
-  https://www.python.org/downloads/
-  
-- 
+### Windows
+
+The Python(x,y) distribution has all of the tools needed. Download it here: http://python-xy.github.io/downloads.html
+
 
 
 ## Terms
