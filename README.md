@@ -45,5 +45,17 @@ If you don't do the full installation, make sure you go through the list and inc
 
   Segments within regions will be analyzed separately
 
+## Examples
 
+### Waypoints
+
+Example files are located in the directory `examples/waypoints`. `features.tif` shows an example of marked waypoints.
+
+To run this example:
+
+```
+python run.py --path-check ../examples/waypoints/
+```
+
+This will show the computed path based on the waypoints provided. 
 
