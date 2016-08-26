@@ -45,7 +45,14 @@ parser.add_option("--shape-factors",
                   action="store_const", dest="program",
                   default="all", const="shape-factors",
                   help="Calculate shape factors for cell")
-
+parser.add_option("--coverage",
+                  action="store_const", dest="program",
+                  default="all", const="coverage",
+                  help="Perimeter coverage.")
+parser.add_option("--segments",
+                  action="store_const", dest="program",
+                  default="all", const="segments",
+                  help="Process segments")
 parser.add_option("-f", "--file", dest="filename",
                   help="write report to FILE", metavar="FILE")
 (options, args) = parser.parse_args()
@@ -293,10 +300,44 @@ if options.program == "shape-factors":
                    bbox_inches='tight', pad_inches=0, dpi=300)
 
 
+if options.program == "coverage":
+    waypoints, redlines, regions = \
+        jocelyn.image.extract_features(input_image, feature_images)
+
+    paths = jocelyn.waypoints.find_path(input_image, waypoints)
+
+    cell = Cell(input_image, paths)
+
+    path_coverage, point_coverage, percent_coverage = \
+        cell.get_perimeter_coverage()
+
+    print "Perimeter Coverage: %.4f" % percent_coverage
+
+    with open(output_directory + 'coverage-data.csv', 'wb') as csv_f:
+        writer = csv.writer(csv_f)
+        writer.writerow(['Point', 'Row', 'Column', 'Covered'])
+        for point in range(0, len(path_coverage)):
+            writer.writerow([point, point_coverage[point][0],
+                             point_coverage[point][0], path_coverage[point]])
+
+
+
+
 exit()
 
 
 
+
+if options.program == "segments":
+    waypoints, redlines, regions = \
+        jocelyn.image.extract_features(input_image, feature_images)
+
+    paths = jocelyn.waypoints.find_path(input_image, waypoints)
+
+    edge_segments = jocelyn.segments.find_edge_segments(input_image, paths,
+                                                        redlines, threshold)
+
+    edge_segments[2].hydrate()
 
 edge_segments = jocelyn.segments.find_edge_segments(input_image, paths,
                                                     redlines, threshold)

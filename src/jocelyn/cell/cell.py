@@ -14,13 +14,14 @@ TRACE_COLOR = (0, 0, 255)
 
 class Cell:
 
-    def __init__(self, image, paths):
+    def __init__(self, image, paths, threshold=100):
         self.__area_image = None
         self.__sorted_hull_points = None
         self.__ellipse_parameters = None
 
         self.image = image
         self.paths = paths
+        self.threshold = threshold
 
         # Get a complete path
         self.path = []
@@ -28,6 +29,20 @@ class Cell:
             for e in path:
                 r, c = e
                 self.path.append(e)
+
+    def get_perimeter_coverage(self):
+        gray_image = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+
+        path_coverage = []
+        point_coverage = []
+        for e in self.path:
+            r, c = e
+            path_coverage.append(int(gray_image[r, c] > self.threshold))
+            point_coverage.append((r, c, int(gray_image[r, c] > self.threshold)))
+
+        return path_coverage, point_coverage, \
+               100.0 * float(sum(path_coverage)) / float(len(path_coverage))
+
 
     def get_traced_image(self):
         traced_cell = self.image.copy()
