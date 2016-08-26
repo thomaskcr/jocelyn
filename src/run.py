@@ -1,8 +1,13 @@
+import csv
 import cv2
 import glob
+import math
 import numpy
 import os
 
+import scipy.misc
+
+from skimage import draw
 from matplotlib import pyplot
 from optparse import OptionParser
 
@@ -55,6 +60,12 @@ run_directory = os.path.abspath(relative_directory) + "/"
 if not os.path.isdir(run_directory):
     raise Exception(("You must specify a folder to run jocelyn against. " +
                     "Supplied argument '%s' is not a folder.") % run_directory)
+
+output_directory = run_directory + 'output/'
+
+# Create the output directory if it does not already exist
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
 
 threshold = int(options.threshold)
 
@@ -126,6 +137,160 @@ if options.program == "shape-factors":
     circularity = cell.get_circularity()
     print "Circularity:  %.4f" % circularity
 
+
+
+    # Sector values
+    sect_r_min, sect_r_max, sect_c_min, sect_c_max = cell.get_sector()
+    # Scaled sector values
+    s_s_r_min, s_s_r_max, s_s_c_min, s_s_c_max = \
+        sect_r_min * 10, sect_r_max * 10, sect_c_min * 10, sect_c_max * 10
+
+    pyplot.imshow(cell.get_traced_image())
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'perimeter.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    sector_image = cell.get_sector_image()
+
+    # Save the sector image figure
+    pyplot.imshow(sector_image)
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'sector-perimeter.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    # Save the convex hull figure
+    plotter = cell.get_traced_image()
+
+    plotter = scipy.misc.imresize(plotter,
+                                  (plotter.shape[0]*10, plotter.shape[1]*10, 3))
+
+    hull_points = cell.get_convex_hull()
+
+    hull_image = input_image.copy()
+    hull_image[:, :, 0] = 0
+    hull_image[:, :, 1] = 0
+    hull_image[:, :, 2] = 0
+
+    for idx in range(0, len(hull_points)):
+        if idx == len(hull_points) - 1:
+            s_r, s_c = hull_points[0]
+            e_r, e_c = hull_points[idx]
+        else:
+            s_r, s_c = hull_points[idx]
+            e_r, e_c = hull_points[idx + 1]
+
+        line_rr, line_cc, pressure = draw.line_aa(s_r, s_c, e_r, e_c)
+        hull_image[line_rr, line_cc, 0] = pressure*255
+
+    hull_image = scipy.misc.imresize(hull_image,
+                                     (plotter.shape[0], plotter.shape[1]))
+
+    for e in numpy.transpose(numpy.nonzero(hull_image[:, :, 0])):
+        r, c = e
+        plotter[r, c, 0] = hull_image[r, c, 0]
+        plotter[r, c, 1] = plotter[r, c, 1]
+        plotter[r, c, 2] = hull_image[r, c, 2]
+
+    pyplot.imshow(plotter)
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'convex-hull.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    pyplot.imshow(plotter[s_s_r_min:s_s_r_max, s_s_c_min:s_s_c_max, :])
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'sector-convex-hull.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    # Plot aspect ratio
+    xc, yc, a, b, theta = cell.get_ellipse_parameters()
+
+    r_c, c_c = int(xc), int(yc)
+
+    a_end_r = r_c + a * math.cos(theta)
+    a_end_c = c_c + a * math.sin(theta)
+    a_end_r, a_end_c = int(a_end_r), int(a_end_c)
+
+    a_start_r = r_c - a * math.cos(theta)
+    a_start_c = c_c - a * math.sin(theta)
+    a_start_r, a_start_c = int(a_start_r), int(a_start_c)
+
+    b_end_r = r_c + b * math.cos(theta - math.pi/2.0)
+    b_end_c = c_c + b * math.sin(theta - math.pi/2.0)
+    b_end_r, b_end_c = int(b_end_r), int(b_end_c)
+
+    b_start_r = r_c - b * math.cos(theta - math.pi/2.0)
+    b_start_c = c_c - b * math.sin(theta - math.pi/2.0)
+    b_start_r, b_start_c = int(b_start_r), int(b_start_c)
+
+    plotter = input_image.copy()
+
+    plotter = scipy.misc.imresize(plotter,
+                                  (plotter.shape[0]*10, plotter.shape[1]*10, 3))
+
+    a_aspect_points = input_image.copy()
+    a_aspect_points[:, :, 0] = 0
+    a_aspect_points[:, :, 1] = 0
+    a_aspect_points[:, :, 2] = 0
+
+    b_aspect_points = input_image.copy()
+    b_aspect_points[:, :, 0] = 0
+    b_aspect_points[:, :, 1] = 0
+    b_aspect_points[:, :, 2] = 0
+
+    line_rr, line_cc, pressure = draw.line_aa(r_c, c_c, a_start_r, a_start_c)
+    a_aspect_points[line_rr, line_cc, 0] = pressure*255
+
+    line_rr, line_cc, pressure = draw.line_aa(r_c, c_c, a_end_r, a_end_c)
+    a_aspect_points[line_rr, line_cc, 0] = pressure*255
+
+    line_rr, line_cc, pressure = draw.line_aa(r_c, c_c, b_start_r, b_start_c)
+    b_aspect_points[line_rr, line_cc, 2] = pressure*255
+
+    line_rr, line_cc, pressure = draw.line_aa(r_c, c_c, b_end_r, b_end_c)
+    b_aspect_points[line_rr, line_cc, 2] = pressure*255
+
+
+    a_aspect_points = scipy.misc.imresize(a_aspect_points,
+                                          (plotter.shape[0], plotter.shape[1]))
+
+    rr, cc = numpy.nonzero(a_aspect_points[:, :, 0])
+    plotter[rr, cc, 0] = a_aspect_points[rr, cc, 0]
+
+    rr, cc = numpy.where(a_aspect_points[:, :, 0] == 255)
+    plotter[rr, cc, 1] = 0
+    plotter[rr, cc, 2] = 0
+
+    b_aspect_points = scipy.misc.imresize(b_aspect_points,
+                                          (plotter.shape[0], plotter.shape[1]))
+
+    rr, cc = numpy.nonzero(b_aspect_points[:, :, 2])
+    plotter[rr, cc, 2] = b_aspect_points[rr, cc, 2]
+
+    rr, cc = numpy.where(b_aspect_points[:, :, 2] == 255)
+    plotter[rr, cc, 0] = 0
+    plotter[rr, cc, 1] = 0
+    
+    pyplot.imshow(plotter)
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'aspect-ratio.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    pyplot.imshow(plotter[s_s_r_min:s_s_r_max, s_s_c_min:s_s_c_max, :])
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'sector-aspect-ratio.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
 
 
 exit()

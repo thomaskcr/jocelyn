@@ -1,4 +1,20 @@
 
+## Overview
+
+For the full run, this is an outline of the process:
+
+- Program is supplied with the path to a folder that contains a file named `input.tif` and `features.tif` as well as any options
+  - `input.tif` is the original image
+  - `features.tif` is an image that contains **Feature Marks** as outlined below
+  - A full list of options can be found using the flag `--help`, most options are outlined below as well
+- Waypoints are used to find the perimeter of the cell
+- Shape factors are calculated (area, convex hull area, perimeter, solidity, circularity, aspect ratio)
+  - Solidity, circularity and aspect ratio are dimensionless
+  - Perimeter is in `px`
+  - Area and convex hull area are in `px^2` 
+
+
+
 ## Installation
 
 ### Windows
@@ -14,7 +30,6 @@ If you don't do the full installation, make sure you go through the list and inc
 - Matplotlib
 
 
-## Overview
 
 
 
@@ -33,6 +48,10 @@ If you don't do the full installation, make sure you go through the list and inc
 ## Feature Marking
 
 Feature marking is a way of guiding the algorithm. You will add marks with specific colors to a copy of the image called `features.tif` (or `features.png`, etc). Each mark gives different guidance to the algorithms. 
+
+- Add **waypoints** to guide the algorithm finding the cell perimeter. 
+- Add **regions** to include segments for analysis that do not fall on the perimeter.
+- Add **redlines** to prevent something from being included.
 
 ### Waypoints 
 
@@ -78,21 +97,26 @@ This will show the computed path based on the waypoints provided.
 
 #### Workflow
 
-The `--path-check` flag will only run the path finding between waypoints and display the result. This will allow you to quickly test your waypoints without waiting for the longer parts of the program to run. 
+The `--path-check` flag will only run the path finding between waypoints and display the result. This will allow you to quickly test your waypoints without waiting for the longer parts of the program to run.   
 
-- Redlines
 
-  Pure Red (#FF0000 or (255, 0, 0))
+### Regions
 
-  Will not be crossed when expanding a segment
+Boxes that mark a region of interest - i.e. perpendicular region
 
-  Fully redlined regions will be ignored when doing feature searches
+Segments within regions will be analyzed separately
 
-- Regions
+### Redlines
 
-  Boxes that mark a region of interest - i.e. perpendicular region
+Pure Red (#FF0000 or (255, 0, 0))
 
-  Segments within regions will be analyzed separately
+Will not be crossed when expanding a segment
+
+Fully redlined regions will be ignored when doing feature searches
+
+
+## Options
+
 
 ## Examples
 

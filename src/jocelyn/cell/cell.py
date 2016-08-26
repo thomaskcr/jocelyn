@@ -17,6 +17,7 @@ class Cell:
     def __init__(self, image, paths):
         self.__area_image = None
         self.__sorted_hull_points = None
+        self.__ellipse_parameters = None
 
         self.image = image
         self.paths = paths
@@ -27,6 +28,37 @@ class Cell:
             for e in path:
                 r, c = e
                 self.path.append(e)
+
+    def get_traced_image(self):
+        traced_cell = self.image.copy()
+
+        for path in self.paths:
+            for e in path:
+                r, c = e
+                traced_cell[r, c] = TRACE_COLOR
+
+        return traced_cell
+
+    def get_sector(self):
+        r_min, r_max = None, None
+        c_min, c_max = None, None
+
+        for path in self.paths:
+            for e in path:
+                r, c = e
+                if r_min is None or r < r_min :
+                    r_min = r
+                if r_max is None or r > r_max:
+                    r_max = r
+                if c_min is None or c < c_min :
+                    c_min = c
+                if c_max is None or c > c_max:
+                    c_max = c
+
+        sector_r_min, sector_r_max = r_min - 25, r_max + 25
+        sector_c_min, sector_c_max = c_min - 25, c_max + 25
+
+        return sector_r_min, sector_r_max, sector_c_min, sector_c_max
 
     def get_sector_image(self):
         r_min, r_max = None, None
@@ -124,12 +156,20 @@ class Cell:
 
         return (4.0 * math.pi * area) / perimeter**2
 
-    def get_aspect_ratio(self):
-        path = numpy.asarray(self.path)
-        # path = numpy.asarray(self.get_convex_hull())
-        ellipse = skimage.measure.EllipseModel()
-        ellipse.estimate(path)
+    def get_ellipse_parameters(self):
+        if self.__ellipse_parameters is None:
+            path = numpy.asarray(self.path)
+            #path = path[::10]
+            ellipse = skimage.measure.EllipseModel()
+            ellipse.estimate(path)
 
-        xc, yc, a, b, theta = ellipse.params
+            xc, yc, a, b, theta = ellipse.params
+
+            self.__ellipse_parameters = ellipse.params
+
+        return self.__ellipse_parameters
+
+    def get_aspect_ratio(self):
+        xc, yc, a, b, theta = self.get_ellipse_parameters()
 
         return float(a) / float(b)
