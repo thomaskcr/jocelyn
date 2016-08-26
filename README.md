@@ -61,6 +61,24 @@ By adding 3 waypoints you can redirect the path finding algorithm to include the
  Pencil tool:
  
  ![](doc/pencil.png)
+ 
+#### Example
+
+Example files are located in the directory `examples/waypoints`. `features.tif` shows an example of marked waypoints.
+
+To run this example:
+
+```
+python run.py --path-check ../examples/waypoints/
+```
+
+This will show the computed path based on the waypoints provided. 
+
+![](examples/waypoints/output_figure_1.png)
+
+#### Workflow
+
+The `--path-check` flag will only run the path finding between waypoints and display the result. This will allow you to quickly test your waypoints without waiting for the longer parts of the program to run. 
 
 - Redlines
 
@@ -78,19 +96,7 @@ By adding 3 waypoints you can redirect the path finding algorithm to include the
 
 ## Examples
 
-### Waypoints
 
-Example files are located in the directory `examples/waypoints`. `features.tif` shows an example of marked waypoints.
-
-To run this example:
-
-```
-python run.py --path-check ../examples/waypoints/
-```
-
-This will show the computed path based on the waypoints provided. 
-
-![](examples/waypoints/output_figure_1.png)
 
 ### Shape Factors
 
