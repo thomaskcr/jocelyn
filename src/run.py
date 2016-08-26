@@ -103,7 +103,7 @@ if options.program == "path-check":
     waypoints, redlines, regions = \
         jocelyn.image.extract_features(input_image, feature_images)
 
-    paths = jocelyn.waypoints.find_path(input_image, waypoints)
+    paths = jocelyn.waypoints.find_path(input_image, waypoints, redlines)
 
     gray_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
 
