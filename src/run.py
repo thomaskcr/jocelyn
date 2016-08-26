@@ -23,14 +23,24 @@ parser.add_option("-v", "--verbose",
 parser.add_option("-d", "--debug",
                   action="store_true", dest="debug", default=False,
                   help="Print debug information")
+parser.add_option("--show-plots",
+                  action="store_true", dest="debug", default=False,
+                  help="Print debug information")
+
+
 parser.add_option("-t", "--threshold",
                   action="store", dest="threshold", default=100,
-                  help="Change the threshold used for calculation. Default " +
-                       "threshold is 100. ")
+                  help="Change the threshold used for calculation (default " +
+                       "threshold is 100)")
 parser.add_option("--path-check",
                   action="store_const", dest="program",
                   default="all", const="path-check",
                   help="Check only the paths")
+parser.add_option("--shape-factors",
+                  action="store_const", dest="program",
+                  default="all", const="shape-factors",
+                  help="Calculate shape factors for cell")
+
 parser.add_option("-f", "--file", dest="filename",
                   help="write report to FILE", metavar="FILE")
 (options, args) = parser.parse_args()
@@ -85,6 +95,32 @@ if options.program == "path-check":
 
     pyplot.imshow(path_image)
     pyplot.show()
+
+if options.program == "shape-factors":
+    waypoints, redlines, regions = \
+        jocelyn.image.extract_features(input_image, feature_images)
+
+    paths = jocelyn.waypoints.find_path(input_image, waypoints)
+
+    cell = Cell(input_image, paths)
+
+    area = cell.get_area()
+    print "Area:         %.4f" % area
+
+    convex_area = cell.get_convex_area()
+    print "Convex Area:  %.4f" % convex_area
+
+    solidity = cell.get_solidity()
+    print "Solidity:     %.4f" % solidity
+
+    perimeter = cell.get_perimeter()
+    print "Perimeter:    %.4f" % perimeter
+
+    aspect_ratio = cell.get_aspect_ratio()
+    print "Aspect Ratio: %.4f" % aspect_ratio
+
+    circularity = cell.get_circularity()
+    print "Circularity:  %.4f" % circularity
 
 
 

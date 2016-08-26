@@ -15,6 +15,9 @@ TRACE_COLOR = (0, 0, 255)
 class Cell:
 
     def __init__(self, image, paths):
+        self.__area_image = None
+        self.__sorted_hull_points = None
+
         self.image = image
         self.paths = paths
 
@@ -49,43 +52,50 @@ class Cell:
 
         return traced_cell[sector_r[0]:sector_r[1], sector_c[0]:sector_c[1]]
 
+
     def get_area_image(self):
-        path = numpy.asarray(self.path)
+        if self.__area_image is None:
+            path = numpy.asarray(self.path)
 
-        area_image = numpy.zeros(self.image.shape)
-        rr, cc = skimage.draw.polygon(path[:,0], path[:,1], self.image.shape)
-        area_image[rr, cc, 1] = 100
+            area_image = numpy.zeros(self.image.shape)
+            rr, cc = skimage.draw.polygon(path[:,0], path[:,1], self.image.shape)
+            area_image[rr, cc, 1] = 100
 
-        return area_image
+            self.__area_image = area_image
+
+        return self.__area_image
 
     def get_area(self):
         area_image = self.get_area_image()
 
-        return numpy.count_nonzero(area_image[:, :, 1])
+        return float(numpy.count_nonzero(area_image[:, :, 1]))
 
     def get_perimeter(self):
         area_image = self.get_area_image()
         area_image = area_image[:, :, 1]
         area_image[numpy.nonzero(area_image)] = 1
 
-        return skimage.measure.perimeter(area_image)
+        return float(skimage.measure.perimeter(area_image))
 
     def get_convex_hull(self):
-        path = numpy.asarray(self.path)
+        if self.__sorted_hull_points is None:
+            path = numpy.asarray(self.path)
 
-        hull = scipy.spatial.ConvexHull(self.path)
-        hull_indices = numpy.unique(hull.simplices.flat)
+            hull = scipy.spatial.ConvexHull(self.path)
+            hull_indices = numpy.unique(hull.simplices.flat)
 
-        hull_points = path[hull_indices, :]
+            hull_points = path[hull_indices, :]
 
-        centroid = (sum([p[0] for p in hull_points])/len(hull_points),
-                    sum([p[1] for p in hull_points])/len(hull_points))
+            centroid = (sum([p[0] for p in hull_points])/len(hull_points),
+                        sum([p[1] for p in hull_points])/len(hull_points))
 
-        sorted_hull_points = \
-            sorted(hull_points,
-                   key=lambda p: math.atan2(p[1]-centroid[1], p[0]-centroid[0]))
+            sorted_hull_points = \
+                sorted(hull_points,
+                       key=lambda p: math.atan2(p[1]-centroid[1], p[0]-centroid[0]))
 
-        return sorted_hull_points
+            self.__sorted_hull_points = sorted_hull_points
+
+        return self.__sorted_hull_points
 
     def get_convex_area_image(self):
         hull_points = self.get_convex_hull()
@@ -98,12 +108,12 @@ class Cell:
         hull_area_image = numpy.zeros(self.image.shape)
         hull_area_image[hull_r, hull_c, 1] = 100
 
-        return hull_area_image
+        return float(hull_area_image)
 
     def get_convex_area(self):
         sorted_hull_points = self.get_convex_hull()
         convex_area = shoelace_area(sorted_hull_points)
-        return convex_area
+        return float(convex_area)
 
     def get_solidity(self):
         return float(self.get_area() / self.get_convex_area())
@@ -112,7 +122,7 @@ class Cell:
         perimeter = self.get_perimeter()
         area = self.get_area()
 
-        return (4 * math.pi * area) / perimeter**2
+        return (4.0 * math.pi * area) / perimeter**2
 
     def get_aspect_ratio(self):
         path = numpy.asarray(self.path)
@@ -122,4 +132,4 @@ class Cell:
 
         xc, yc, a, b, theta = ellipse.params
 
-        return a / b
+        return float(a) / float(b)
