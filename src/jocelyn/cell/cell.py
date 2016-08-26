@@ -10,7 +10,7 @@ from matplotlib import pyplot
 
 from utility import shoelace_area
 
-TRACE_COLOR = (0, 0, 255)
+TRACE_COLOR = (255, 0, 255)
 
 class Cell:
 

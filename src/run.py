@@ -18,6 +18,7 @@ import jocelyn.segments
 
 from jocelyn.cell import Cell
 from jocelyn.edge import Edge
+from jocelyn.image import Image
 
 usage = "usage: %prog [options] input-folder"
 parser = OptionParser(usage=usage)
@@ -45,10 +46,10 @@ parser.add_option("--shape-factors",
                   action="store_const", dest="program",
                   default="all", const="shape-factors",
                   help="Calculate shape factors for cell")
-parser.add_option("--coverage",
+parser.add_option("--perimeter",
                   action="store_const", dest="program",
-                  default="all", const="coverage",
-                  help="Perimeter coverage.")
+                  default="all", const="perimeter",
+                  help="Calculate the perimeter incidence data.")
 parser.add_option("--segments",
                   action="store_const", dest="program",
                   default="all", const="segments",
@@ -122,7 +123,7 @@ if options.program == "shape-factors":
     waypoints, redlines, regions = \
         jocelyn.image.extract_features(input_image, feature_images)
 
-    paths = jocelyn.waypoints.find_path(input_image, waypoints)
+    paths = jocelyn.waypoints.find_path(input_image, waypoints, redlines)
 
     cell = Cell(input_image, paths)
 
@@ -143,8 +144,6 @@ if options.program == "shape-factors":
 
     circularity = cell.get_circularity()
     print "Circularity:  %.4f" % circularity
-
-
 
     # Sector values
     sect_r_min, sect_r_max, sect_c_min, sect_c_max = cell.get_sector()
@@ -300,7 +299,7 @@ if options.program == "shape-factors":
                    bbox_inches='tight', pad_inches=0, dpi=300)
 
 
-if options.program == "coverage":
+if options.program == "perimeter":
     waypoints, redlines, regions = \
         jocelyn.image.extract_features(input_image, feature_images)
 
@@ -320,7 +319,8 @@ if options.program == "coverage":
             writer.writerow([point, point_coverage[point][0],
                              point_coverage[point][0], path_coverage[point]])
 
-
+if options.program == "coverage":
+    image = Image(input_image, feature_images)
 
 
 exit()

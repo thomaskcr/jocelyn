@@ -12,7 +12,7 @@ from matplotlib import pyplot
 WAYPOINT_COLOR = (255, 0, 0)
 REDLINE_COLOR = (0, 0, 255)
 REGION_COLOR = (0, 255, 0)
-
+VOID_SEED_COLOR = (255, 0, 255)
 
 def _get_waypoints(image, feature_image):
     """
@@ -133,6 +133,38 @@ def _get_regions(image, feature_image):
         region_masses[idx] = mass
 
     return region_masses
+
+def _get_void_seeds(image, feature_image):
+    """
+    Get a 1-indexed dictionary of void seeds
+
+    Seeds may be arbitrarily shaped but I encourage circles
+
+    Args:
+        image (numpy.ndarray): Original image file, must have 3 channels (RGB).
+        feature_image (numpy.ndarray): Image file with features highlighted,
+            image must have 3 channels (BRG).
+
+    """
+
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    region_image = numpy.zeros(gray_image.shape)
+
+    region_indexes = \
+        numpy.where(numpy.all(feature_image == REGION_COLOR, axis = -1))
+    region_image[region_indexes[0], region_indexes[1]] = 100
+
+    binary_full = scipy.ndimage.generate_binary_structure(2, 2)
+    labeled_objects, num_objects = scipy.ndimage.label(region_image,
+                                                       structure=binary_full)
+
+    region_masses = {}
+    for idx in range(1, num_objects + 1):
+        mass = labeled_objects.copy()
+        mass[mass != idx] = 0
+        region_masses[idx] = mass
+
+        return region_masses
 
 
 def extract_features(image, feature_images):

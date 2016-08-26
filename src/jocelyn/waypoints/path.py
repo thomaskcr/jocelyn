@@ -7,10 +7,22 @@ from matplotlib import pyplot
 from skimage import morphology
 from skimage import graph
 
-MAX_TEST = 1
+MAX_TEST = 3
 
-def find_path(image, waypoints):
+def find_path(image, waypoints, redlines=None):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    contrast = gray_image.copy().astype(numpy.float_)
+
+    contrast = numpy.square(contrast / numpy.max(gray_image)) * 255
+
+    gray_image = contrast.copy().astype(gray_image.dtype)
+
+    # Handle redlines
+    if redlines is not None:
+        for redline in redlines:
+            r, c = redline
+            gray_image[r, c] = 0
 
     paths = []
 
