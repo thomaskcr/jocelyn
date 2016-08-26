@@ -277,7 +277,7 @@ if options.program == "shape-factors":
     rr, cc = numpy.where(b_aspect_points[:, :, 2] == 255)
     plotter[rr, cc, 0] = 0
     plotter[rr, cc, 1] = 0
-    
+
     pyplot.imshow(plotter)
     cur_axes = pyplot.gca()
     cur_axes.axes.get_xaxis().set_visible(False)
