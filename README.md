@@ -14,6 +14,11 @@ If you don't do the full installation, make sure you go through the list and inc
 - Matplotlib
 
 
+## Overview
+
+
+
+
 ## Terms
 
 - Sector - Piece of an image
@@ -27,13 +32,35 @@ If you don't do the full installation, make sure you go through the list and inc
 
 ## Feature Marking
 
-- Waypoints
+Feature marking is a way of guiding the algorithm. You will add marks with specific colors to a copy of the image called `features.tif` (or `features.png`, etc). Each mark gives different guidance to the algorithms. 
 
-  Pure Blue (#0000FF or (0, 0, 255))
+### Waypoints 
 
-  Followed by program as a general outline of the cell - don't need to be perfectly accurate.
+Waypoints mark a general path for computing the perimeter of the cell. 
+ 
+The edge finding algorithm works by finding the Minimum Cost Path between each waypoint. The cost matrix is calculated by inverting the intensity of each pixel in the image by subtracting it from 255 (each pixel is an 8 bit integer, `2^8 - 1 = 255` (range starts at 0 not 1)). 
   
-  **Note:** It is important when adding these to pay attention to the behavior of your image editor of choice. For example, in Gimp the paint brush will create "soft" edges instead of just setting all of the pixels to the value you selected. In Gimp make sure to use the pencil tool. 
+By finding the minimum cost path, it is effectively finding the shortest but brightest path between the two points. 
+
+Waypoints are added to the image as a single pixel colored pure blue (Hex: #0000FF, RGB: (0, 0, 255)). They should be added when the minimum cost path between two points won't necessarily be the best estimation of the cell's edge. You can add additional waypoints to shorten the distance between waypoints, making it more costly for the algorithm to go out of the way. 
+
+As an example, the minimum cost path in this figure does not follow the apparent cell edge. 
+
+![](doc/waypoints-example-1.png)
+
+By adding 3 waypoints you can redirect the path finding algorithm to include the convex region. 
+
+![](doc/waypoints-example-2.png)
+
+**Note:** It is important when adding these to pay attention to the behavior of your image editor of choice. For example, in Gimp the paint brush will create "soft" edges instead of just setting all of the pixels to the value you selected. In Gimp make sure to use the pencil tool. 
+  
+ Brush tool: 
+ 
+ ![](doc/brush.png)
+ 
+ Pencil tool:
+ 
+ ![](doc/pencil.png)
 
 - Redlines
 

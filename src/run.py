@@ -93,6 +93,10 @@ if options.program == "path-check":
             r, c = e
             path_image[r, c] = 255, 0, 0
 
+    for waypoint in waypoints:
+        r, c = waypoint
+        path_image[r, c] = 0, 0, 255
+
     pyplot.imshow(path_image)
     pyplot.show()
 
