@@ -151,7 +151,7 @@ def _get_void_seeds(image, feature_image):
     region_image = numpy.zeros(gray_image.shape)
 
     region_indexes = \
-        numpy.where(numpy.all(feature_image == REGION_COLOR, axis = -1))
+        numpy.where(numpy.all(feature_image == VOID_SEED_COLOR, axis = -1))
     region_image[region_indexes[0], region_indexes[1]] = 100
 
     binary_full = scipy.ndimage.generate_binary_structure(2, 2)
@@ -164,7 +164,7 @@ def _get_void_seeds(image, feature_image):
         mass[mass != idx] = 0
         region_masses[idx] = mass
 
-        return region_masses
+    return region_masses
 
 
 def extract_features(image, feature_images):

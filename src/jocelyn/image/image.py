@@ -1,7 +1,10 @@
+import cv2
 import numpy
 
+from matplotlib import pyplot
 
 from features import _get_void_seeds
+from k_means import cluster_image
 
 class Image:
 
@@ -23,9 +26,26 @@ class Image:
         self.void_seeds = _get_void_seeds(image, feature_image)
 
     def get_coverage(self):
+        gray_image = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+
+        clustered, centers = cluster_image(self.image, 16)
+
+        print centers
 
         voids = self.void_seeds
+
         for idx, void in voids.iteritems():
+            normalized = numpy.zeros(gray_image.shape)
+            normalized[numpy.nonzero((void == idx))] = 1
+
+            average = numpy.mean(gray_image[void == idx])
+            print average
+
+            #pyplot.imshow(normalized)
+            #pyplot.show()
+
+
             print idx, numpy.count_nonzero(void)
+
 
 

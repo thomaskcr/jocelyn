@@ -174,7 +174,7 @@ class Cell:
     def get_ellipse_parameters(self):
         if self.__ellipse_parameters is None:
             path = numpy.asarray(self.path)
-            #path = path[::10]
+            path = path[::10]
             ellipse = skimage.measure.EllipseModel()
             ellipse.estimate(path)
 

@@ -4,6 +4,7 @@ import glob
 import math
 import numpy
 import os
+import time
 
 import scipy.misc
 
@@ -50,6 +51,10 @@ parser.add_option("--perimeter",
                   action="store_const", dest="program",
                   default="all", const="perimeter",
                   help="Calculate the perimeter incidence data.")
+parser.add_option("--coverage",
+                  action="store_const", dest="program",
+                  default="all", const="coverage",
+                  help="Calculate void space and cellular coverage.")
 parser.add_option("--segments",
                   action="store_const", dest="program",
                   default="all", const="segments",
@@ -322,6 +327,7 @@ if options.program == "perimeter":
 if options.program == "coverage":
     image = Image(input_image, feature_images)
 
+    image.get_coverage()
 
 exit()
 
