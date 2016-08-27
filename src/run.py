@@ -310,7 +310,7 @@ if options.program == "perimeter":
 
     paths = jocelyn.waypoints.find_path(input_image, waypoints)
 
-    cell = Cell(input_image, paths)
+    cell = Cell(input_image, paths, threshold=threshold)
 
     path_coverage, point_coverage, percent_coverage = \
         cell.get_perimeter_coverage()
