@@ -124,6 +124,16 @@ You can use the growth rate limit to control how far the void will bleed into ne
 
 **Note:** Seeds are denoted by contiguous region, so if you make two separate marks but they are touching, that will still only be one region.
 
+#### Example
+
+Example files are located in the directory `examples/coverage`. `features.tif` shows an example of marked void seeds.
+
+To run this example:
+
+```
+python run.py --coverage ../examples/coverage/
+```
+
 ![](doc/void-growth.gif)
 
 
