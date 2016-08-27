@@ -19,7 +19,7 @@ def cluster_image(image_region, clusters):
     image_pixels = numpy.float32(image_pixels)
 
     compactness, labels, cluster_centers = \
-        cv2.kmeans(image_pixels, clusters, None, k_means_criteria, iterations,
+        cv2.kmeans(image_pixels, clusters, k_means_criteria, iterations,
                    k_means_flags)
 
     # Convert back to unsigned 8 bit integers

@@ -1,6 +1,10 @@
 
 data/
 
+examples/coverage/output/
+examples/shapes/output/
+examples/waypoints/output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

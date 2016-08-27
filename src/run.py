@@ -317,7 +317,7 @@ if options.program == "perimeter":
 
     print "Perimeter Coverage: %.4f" % percent_coverage
 
-    with open(output_directory + 'coverage-data.csv', 'wb') as csv_f:
+    with open(output_directory + 'perimeter-data.csv', 'wb') as csv_f:
         writer = csv.writer(csv_f)
         writer.writerow(['Point', 'Row', 'Column', 'Covered'])
         for point in range(0, len(path_coverage)):
@@ -327,7 +327,31 @@ if options.program == "perimeter":
 if options.program == "coverage":
     image = Image(input_image, feature_images)
 
-    image.get_coverage()
+    process_image, void_percent = image.get_coverage()
+    print "Image Void Percentage: %.4f" % void_percent
+
+    pyplot.imshow(process_image)
+    cur_axes = pyplot.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
+    pyplot.savefig(output_directory + 'image-coverage.png',
+                   bbox_inches='tight', pad_inches=0, dpi=300)
+
+    pyplot.imshow(process_image)
+    pyplot.show()
+
+    # This is for the movie mode
+    if 1 == 2:
+        frames = image.get_coverage(movie=True)
+        f_no = 1000
+        for frame in frames:
+            pyplot.imshow(frame)
+            cur_axes = pyplot.gca()
+            cur_axes.axes.get_xaxis().set_visible(False)
+            cur_axes.axes.get_yaxis().set_visible(False)
+            pyplot.savefig(output_directory + 'coverage/%d.png' % f_no,
+                           bbox_inches='tight', pad_inches=0)
+            f_no += 1
 
 exit()
 
