@@ -114,6 +114,18 @@ Will not be crossed when expanding a segment
 
 Fully redlined regions will be ignored when doing feature searches
 
+### Void Seeds
+
+To analyze the coverage on the image you will need to add marks to the image that show where voids will grow from. Any piece of the image not covered by cells should be marked using a pure magenta color denoted by hex code #FF00FF and RGB value (255, 0, 255).
+
+The algorithm will k-means cluster the image and then grow each region adding any neighbor pixels that have an intensity that falls within the bottom two clusters/bins that have not already been assigned to a different void seed. Pixels will continue to be added until a less than 15% of the attempted additions succeed.
+
+You can use the growth rate limit to control how far the void will bleed into neighboring regions. By putting two seeds close together you limit their growth since they will quickly no longer be able to add any pixels where they meet. If you would like a void to be likely to spread past obstacles (i.e. a noisy area on the image that should be included in the void), the best position for the seed is in the middle of the area. In the case of a region with ill-defined but existing boundaries, putting multiple seeds in close quarters will make them more susceptible to obstacles stopping the growth.
+
+**Note:** Seeds are denoted by contiguous region, so if you make two separate marks but they are touching, that will still only be one region.
+
+![](doc/void-growth.gif)
+
 
 ## Options
 
